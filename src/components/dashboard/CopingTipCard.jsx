@@ -8,24 +8,35 @@ const MotionBox = motion(Box);
 
 const CopingTipCard = () => {
   const [userInput, setUserInput] = useState('');
-  const [aiTip, setAiTip] = useState('');
+  const [conversation, setConversation] = useState([]);
+
   const userName = 'Alex'; // 🔁 Later make dynamic
 
-  const fetchTip = async () => {
+  const fetchReply = async () => {
     if (!userInput.trim()) return;
 
+    const updatedMessages = [
+      ...conversation,
+      { role: 'user', content: userInput }
+    ];
+
     try {
-      const res = await fetch('http://localhost:5000/ai-tip', {
+      const res = await fetch('http://localhost:5100/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userInput }),
+        body: JSON.stringify({ messages: updatedMessages }),
       });
 
       const data = await res.json();
-      setAiTip(data.summary || 'No tip generated.');
+      const botReply = data.reply || 'Sorry, something went wrong.';
+
+      setConversation([
+        ...updatedMessages,
+        { role: 'assistant', content: botReply }
+      ]);
+      setUserInput('');
     } catch (err) {
       console.error(err);
-      setAiTip('Something went wrong. Try again.');
     }
   };
 
@@ -47,20 +58,54 @@ const CopingTipCard = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      {/* Header with Avatar */}
+      {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
         <Avatar alt="AI Assistant" src="/ai-avatar.png" sx={{ width: 48, height: 48 }} />
         <Box>
           <Typography variant="subtitle2" sx={{ color: '#888' }}>
-            Hey {userName || 'Friend'},
+            Hey {userName},
           </Typography>
           <Typography variant="h6" fontWeight={700} sx={{ color: '#64c5a3' }}>
-            Share what’s on your mind
+            I'm here for you 💬
           </Typography>
         </Box>
       </Box>
 
-      {/* Input box */}
+      {/* Conversation Box */}
+      <Box
+        sx={{
+          flex: 1,
+          overflowY: 'auto',
+          maxHeight: '300px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 1,
+          p: 1,
+          border: '1px solid #eee',
+          borderRadius: '10px',
+          bgcolor: '#f9f9f9',
+        }}
+      >
+        {conversation.map((msg, idx) => (
+          <Box
+            key={idx}
+            sx={{
+              alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
+              bgcolor: msg.role === 'user' ? '#d4f3ef' : '#ffffff',
+              px: 2,
+              py: 1,
+              borderRadius: 2,
+              maxWidth: '75%',
+              boxShadow: 1,
+              color: '#333',
+            }}
+          >
+            <Typography variant="body2">{msg.content}</Typography>
+          </Box>
+        ))}
+      </Box>
+
+      {/* Input */}
       <Box sx={{ display: 'flex', gap: 1 }}>
         <TextField
           fullWidth
@@ -70,20 +115,10 @@ const CopingTipCard = () => {
           variant="outlined"
           size="small"
         />
-        <Button variant="contained" onClick={fetchTip} sx={{ bgcolor: '#64c5a3' }}>
+        <Button variant="contained" onClick={fetchReply} sx={{ bgcolor: '#64c5a3' }}>
           Send
         </Button>
       </Box>
-
-      {/* Tip Content */}
-      {aiTip && (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <EmojiObjectsIcon sx={{ color: '#f5b04c' }} />
-          <Typography variant="body1" sx={{ color: '#444', fontStyle: 'italic' }}>
-            {aiTip}
-          </Typography>
-        </Box>
-      )}
 
       <Box sx={{ mt: 2, textAlign: 'right' }}>
         <Typography variant="caption" sx={{ color: '#aaa' }}>

@@ -27,6 +27,11 @@ app.get('/', (req, res) => {
 // Journal Routes
 app.use('/journal', journalRoutes); // ✅ moved here
 
+//GeminiRoutes
+const geminiRoutes = require('./routes/geminiRoutes');
+app.use('/gemini', geminiRoutes);
+
+
 // Signup Route
 app.post('/signup', async (req, res) => {
   try {

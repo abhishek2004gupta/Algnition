@@ -5,7 +5,7 @@ import torch
 from flask_cors import CORS    
 import google.generativeai as genai
 import os
-genai.configure(api_key="AIzaSyBqVlduIMyqEetIzucDWNZA68cd2gZIFnI")
+genai.configure(api_key="Enter key")
 gemmodel = genai.GenerativeModel(model_name="gemini-1.5-pro-latest")
 app = Flask(__name__)
 CORS(app, supports_credentials=True)

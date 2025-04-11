@@ -1,7 +1,7 @@
 // src/utils/geminiService.js
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI("AIzaSyBw3Gnxli7Mn5rgpy9k64Tnnw9l9fW_dZs");
+const genAI = new GoogleGenerativeAI("api_key");
 
 export const summarizeJournals = async (entries) => {
   const prompt = `
